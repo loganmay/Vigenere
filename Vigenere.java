@@ -3,7 +3,7 @@
  * Author: Logan May
  *
  * Email: mayl2@misericordia.edu
- * 
+ *
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -88,9 +88,7 @@ public class Vigenere {
     // Initialize varibles and arrays
     int keyLength = key.length();
     int cipherLength = cipher.length();
-    char[] keyChars = new char[keyLength];
     int[]  keyAscii = new int[keyLength];
-    char[] cipherChars = new char[cipherLength];
     int[]  cipherAscii = new int[cipherLength];
     String[] clearString = new String[cipherLength];
     int[]  clearAscii = new int[cipherLength];;
@@ -98,14 +96,12 @@ public class Vigenere {
 
     // Store the key as an array of chars and store the Ascii values
     for(int i = 0; i < key.length(); i++) {
-      keyChars[i] = key.charAt(i);
-      keyAscii[i] = (int) keyChars[i];
+      keyAscii[i] = (int) key.charAt(i);
     }
 
     // Store the cipher as an array of chars and store the Ascii values
     for (int i = 0; i < cipher.length(); i++) {
-      cipherChars[i] = cipher.charAt(i);
-      cipherAscii[i] = (int) cipherChars[i];
+      cipherAscii[i] = (int) cipher.charAt(i);
     }
 
     // Create ciphertext
