@@ -100,13 +100,15 @@ public class Vigenere {
     return clear;
   }
   /**
-   * Attempts a brute force attack on a Vigenere cipher by attempting all possible keys.
+   * Attempts a brute force attack on a Vigenere cipher by attempting all possible keys. It prints all of the
+   * key-cleartext pairs.
    *
    * @param keyspace  int for the size of the keyspace
    * @param cipher    String of cipher text to brute forced
    * 
    */
   public static void bruteForce(int keyspace, String cipher) {
+    
     // Initialize
     String key = "";
     String clear;
@@ -134,6 +136,52 @@ public class Vigenere {
       key = nextKey(key);
     }
   }
+    /**
+   * Attempts a brute force attack on a Vigenere cipher by attempting all possible keys, but stops when a given
+   * word is detected.
+   *
+   * @param keyspace  int for the size of the keyspace
+   * @param scanWord  String for the word we're scanning for
+   * @param cipher    String of cipher text to brute forced
+   * @return key      String of the key that worked or "none" if the word was not found
+   * 
+   */
+  public static String bruteForceScan(int keyspace, String scanWord, String cipher) {
+    
+    // Initialize
+    String key = "";
+    String clear;
+    int[] keyAscii = new int[keyspace];
+    Arrays.fill(keyAscii, 65);
+    double iters = (Math.pow(26.0, (double) keyspace));
+    boolean scan = false;
+
+    // Form string from array of Ascii values
+    StringBuilder sb = new StringBuilder();
+    for (int j = 0; j < keyspace; j++) {
+      sb.append( (char) keyAscii[j] );
+    }
+    key = sb.toString();
+
+    // Try every possible key
+    for (int i = 0; i < iters; i++) {
+
+      // Decrypt this key
+      clear = decrypt(key, cipher);
+      
+      // Check if the word is there
+      scan = scan(scanWord, clear);
+      
+      // If it is, we're done
+      if (scan) return key;
+
+      // Otherwise, keep going, get next key
+      key = nextKey(key);
+    }
+    // We couldn't find it.  return "none"
+    return "none";
+    
+  }
   /**
    * Given a key, returns the next logical key in the keyspace (e.g. AA -> AB, AZ -> BA)
    *
@@ -141,8 +189,12 @@ public class Vigenere {
    * @return          String of the next logical key
    */
   public static String nextKey(String key) {
+    
+    // Initialize
     int keyspace = key.length();
     StringBuilder sb = new StringBuilder(key);
+    
+    // Get the next key if it's a special case
     if ( (int) key.charAt(keyspace - 1) == 90 ) {
       for (int i = 1; i < keyspace; i++) {
         if ( (int) key.charAt(keyspace - i) == 90 ) {
@@ -152,9 +204,13 @@ public class Vigenere {
           sb.setCharAt(keyspace - (i + 1), next);
         }
       }
+      
+    // Fix format and return
     key = sb.toString();
     return key;
     }
+    
+    // Get the next key if it's a simple increment, fix format, and return
     else {
       int current = (int) sb.charAt(keyspace - 1);
       char next = (char) (current + 1);
@@ -170,18 +226,28 @@ public class Vigenere {
    * @return          String without brackets, commas, or spaces 
    */
     public static String clean(String arrString) {
-    StringBuilder dec = new StringBuilder(arrString);
-    StringBuilder rec = new StringBuilder();
+      
+    // Initialize
+    StringBuilder dec = new StringBuilder(arrString); // Stands for 'decremented'
+    StringBuilder rec = new StringBuilder();          // Stands for 'recorded'
+    
+    // Remove brackets
     dec.deleteCharAt(arrString.length() - 1);
     dec.deleteCharAt(0);
-    dec.append("..");
+    dec.append(".."); // accounts for last iteration of coming loop
+    
+    // Count how many letters
     int range = dec.length() / 3;
+    
+    // Once per letter
     for (int i = 0; i < range; i++) {
-      rec.append(dec.charAt(0));
-      dec.deleteCharAt(0);
-      dec.deleteCharAt(0);
-      dec.deleteCharAt(0);
+      rec.append(dec.charAt(0));  // Save the letter
+      dec.deleteCharAt(0);        // Remove it
+      dec.deleteCharAt(0);        // Remove the comma
+      dec.deleteCharAt(0);        // Remove the soace
     }
+    
+    // Back to a string and return
     String result = rec.toString();
     return result;
   }
@@ -194,5 +260,29 @@ public class Vigenere {
   public static String layer(String cipher) {
     String cipherNew = encrypt(cipher, cipher);
     return cipherNew;
+  }
+    /**
+   * Scans cipher text to see if it contains a particular word.
+   * 
+   * @param scanWord  String for the word we are scanning for
+   * @param cipher    String for the cipher text
+   * @return          Boolean true if it the word is found, false if it is not
+   */
+  public static boolean scan(String scanWord, String cipher) {
+    
+    // Initialize
+    StringBuilder sbCipher  = new StringBuilder(cipher); // An SB of the whole cipher
+    StringBuilder sbSection = new StringBuilder();       // An SB to hold sections of the cipher we're checking for the word
+    int end = scanWord.length();     // Index of the last letter of the section
+    int last = cipher.length() - 1;  // Index of the last letter of the cipher
+    boolean same = false;            // Holds the truth value of the comparison
+    
+    // Loop through each section of the cipher and check if it's the scanWord
+    for (int start = 0; start < last - scanWord.length(); start++) {
+      sbSection.append(sbCipher.substring(start, end));  // Grab the next section of the cipher
+      same = sbSection.toString().equals(scanWord);      // Is it the scanWord?
+      if (same) return same;                             // If it is, we're done
+    }
+    return same;
   }
 }
