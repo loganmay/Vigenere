@@ -1,10 +1,7 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/**
+ * This is a class for working with Vigenere ciphers and related/derived ciphers.
  *
- * Author: Logan May
- *
- * Email: mayl2@misericordia.edu
- *
- *
+ * @author Logan May
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  * Description: This class is for working with Vigenere ciphers. This file contains 4 functions and a main:
@@ -13,19 +10,19 @@
  *
  * * decrypt(): It takes a key and ciphertext and decrypts it with the Vignenere cipher
  *
- * * crack():   It takes a variable that indicates the length of the keyspace and ciphertext. It performs a brute
+ * * bruteForce():   It takes a variable that indicates the length of the keyspace and ciphertext. It performs a brute
  * * * force attack on the cipher with all keys in the provided keyspace by calling decrypt() and nextKey(). It
  * * * prints the result of each attempt to the interactions panel.
  *
  * * nextKey(): It takes a key and generates the next key. A becomes B. AA becomes AB. AZ becomes BA. Etc. When
- * * * called from a loop, as it is in crack(), it can generate all the keys in a given keyspace (e.g. for a space
+ * * * called from a loop, as it is in bruteForce(), it can generate all the keys in a given keyspace (e.g. for a space
  * * * of 3, you can get everything from AAA to ZZZ).
  *
  * * clean(): It takes an array.toString(), gets rid of the brackets and commas, and returns a clean String
  *
  * * layer(): It takes text and encrypts it with itself as the key.
  *
- * * main() is used to call encrypt(), decrypt(), or crack() with given cleartext, ciphertext, and/or keyspace
+ * * main() is used to call encrypt(), decrypt(), or bruteForce() with given cleartext, ciphertext, and/or keyspace
  *
  * One thing I ought to mention about the configuration is that it is set up to work with only a small portion
  * of the ASCII character set (specifically from A-Z). It can be adjusted to work with other intervals, but at
@@ -45,7 +42,13 @@ import java.util.*;
 import java.util.Arrays;
 
 public class Vigenere {
-
+  /**
+   * Encrypts a string with a Vigenere cipher, which requires a key.
+   *
+   * @param key       String for the key
+   * @param clear     String of clear text to be encrypted
+   * @return          String of cipher text
+   */
   public static String encrypt(String key, String clear) {
 
     // Initialize varibles and arrays
@@ -82,7 +85,13 @@ public class Vigenere {
 
     return cipher;
   }
-
+  /**
+   * Decrypts a Vigenere cipher with the provided key
+   *
+   * @param key       String for the key
+   * @param clear     String of cipher text to be decrypted
+   * @return          String of clear text
+   */
   public static String decrypt(String key, String cipher) {
 
     // Initialize varibles and arrays
@@ -119,8 +128,14 @@ public class Vigenere {
 
     return clear;
   }
-
-  public static void crack(int keyspace, String cipher) {
+  /**
+   * Attempts a brute force attack on a Vigenere cipher by attempting all possible keys.
+   *
+   * @param keyspace  int for the size of the keyspace
+   * @param cipher    String of cipher text to brute forced
+   * 
+   */
+  public static void bruteForce(int keyspace, String cipher) {
     // Initialize
     String key = "";
     String clear;
@@ -148,7 +163,12 @@ public class Vigenere {
       key = nextKey(key);
     }
   }
-
+  /**
+   * Given a key, returns the next logical key in the keyspace (e.g. AA -> AB, AZ -> BA)
+   *
+   * @param key       String for the key
+   * @return          String of the next logical key
+   */
   public static String nextKey(String key) {
     int keyspace = key.length();
     StringBuilder sb = new StringBuilder(key);
@@ -172,7 +192,12 @@ public class Vigenere {
       return key;
     }
   }
-
+  /**
+   * Cleans the return string of an Array.toString() by removing brackets, spaces, and commas
+   *
+   * @param arrString String of the form of an Array.toString() call
+   * @return          String without brackets, commas, or spaces 
+   */
     public static String clean(String arrString) {
     StringBuilder dec = new StringBuilder(arrString);
     StringBuilder rec = new StringBuilder();
@@ -189,23 +214,13 @@ public class Vigenere {
     String result = rec.toString();
     return result;
   }
-
+  /**
+   * @desc Encrypts cipher text with itself as a key. Used to create a more complicated, layered cipher.
+   * @param cipher    String for the cipher text
+   * @return          A cipher that's been encrypted yet again
+   */
   public static String layer(String cipher) {
     String cipherNew = encrypt(cipher, cipher);
     return cipherNew;
-  }
-
-  public static void main(String args[]) {
-
-    // Initialize values
-    String key = "LEMON";
-    String clear = "ATTACKATDAWN";
-    String cipher = encrypt(key, clear);
-    String cipher2 = layer(cipher);
-    String cipher3 = decrypt(cipher, cipher2);
-    System.out.println(cipher + "\n" + cipher3);
-    //int keyspace = 3;
-
-
   }
 }
