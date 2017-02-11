@@ -1,42 +1,13 @@
 /**
- * This is a class for working with Vigenere ciphers and related/derived ciphers.
+ * This is a class for working with Vigenere ciphers and related/derived ciphers. It is limited to working with the 
+ * ASCII character set from A to Z, parallel with this picture: 
+ * https://upload.wikimedia.org/wikipedia/commons/9/9a/Vigen%C3%A8re_square_shading.svg
+ * 
+ * On my computer, bruteForce with a keyspace of 3 and cipher of 12 characters took 205 seconds.
  *
  * @author Logan May
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- * Description: This class is for working with Vigenere ciphers. This file contains 4 functions and a main:
- *
- * * encrypt(): It takes a key and cleartext and encrypts it with the Vigenere cipher
- *
- * * decrypt(): It takes a key and ciphertext and decrypts it with the Vignenere cipher
- *
- * * bruteForce():   It takes a variable that indicates the length of the keyspace and ciphertext. It performs a brute
- * * * force attack on the cipher with all keys in the provided keyspace by calling decrypt() and nextKey(). It
- * * * prints the result of each attempt to the interactions panel.
- *
- * * nextKey(): It takes a key and generates the next key. A becomes B. AA becomes AB. AZ becomes BA. Etc. When
- * * * called from a loop, as it is in bruteForce(), it can generate all the keys in a given keyspace (e.g. for a space
- * * * of 3, you can get everything from AAA to ZZZ).
- *
- * * clean(): It takes an array.toString(), gets rid of the brackets and commas, and returns a clean String
- *
- * * layer(): It takes text and encrypts it with itself as the key.
- *
- * * main() is used to call encrypt(), decrypt(), or bruteForce() with given cleartext, ciphertext, and/or keyspace
- *
- * One thing I ought to mention about the configuration is that it is set up to work with only a small portion
- * of the ASCII character set (specifically from A-Z). It can be adjusted to work with other intervals, but at
- * the moment the Vigenere cipher employed is parallel with this table:
- * https://upload.wikimedia.org/wikipedia/commons/9/9a/Vigen%C3%A8re_square_shading.svg
- *
- * time - keyspace = 3, 2'45" (205 seconds)
- * assume for 5 -> (138580 seconds)
- * 8 -> 2435682080
- * 10 -> 1646521086080
- *
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ** * * * * * * * * * * * * * * * * * * *
-*/
+ */
 
 import java.util.*;
 import java.util.Arrays;
@@ -215,7 +186,8 @@ public class Vigenere {
     return result;
   }
   /**
-   * @desc Encrypts cipher text with itself as a key. Used to create a more complicated, layered cipher.
+   * Encrypts cipher text with itself as a key. Used to create a more complicated, layered cipher.
+   * 
    * @param cipher    String for the cipher text
    * @return          A cipher that's been encrypted yet again
    */
