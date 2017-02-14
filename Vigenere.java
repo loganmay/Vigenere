@@ -1,9 +1,5 @@
 /**
- * This is a class for working with Vigenere ciphers and related/derived ciphers. It is limited to working with the 
- * ASCII character set from A to Z, parallel with this picture: 
- * https://upload.wikimedia.org/wikipedia/commons/9/9a/Vigen%C3%A8re_square_shading.svg
- * 
- * On my computer, bruteForce with a keyspace of 3 and cipher of 12 characters took 205 seconds.
+ * This is a class for working with Vigenere ciphers and related/derived ciphers.
  *
  * @author Logan May
  *
@@ -13,6 +9,26 @@ import java.util.*;
 import java.util.Arrays;
 
 public class Vigenere {
+ /**
+  * Holds the starting index of the portion of the ASCII table used.
+  */
+  private int istart;
+ /**
+  * Holds the ending index of the portion of the ASCII table used.
+  */
+  private int iend;
+ /**
+  * Creates a constructor that defines the values of the ASCII table that are used in the various functions.  That way
+  * you can use the whole ASCII table or just a portion (e.g. 65 -> 90 corresponds to A -> Z)
+  *
+  * @param key       String for the key
+  * @param clear     String of clear text to be encrypted
+  * @return          String of cipher text
+  */
+  public Vigenere(int start, int end) {
+    this.istart = start;
+    this.iend = end;
+  }
   /**
    * Encrypts a string with a Vigenere cipher, which requires a key.
    *
@@ -20,7 +36,7 @@ public class Vigenere {
    * @param clear     String of clear text to be encrypted
    * @return          String of cipher text
    */
-  public static String encrypt(String key, String clear) {
+  public String encrypt(String key, String clear) {
 
     // Initialize varibles and arrays
     int keyLength = key.length();
@@ -44,8 +60,8 @@ public class Vigenere {
     // Create ciphertext
     int j = 0;
     for (int i = 0; i < clear.length(); i++) {
-      cipherAscii[i] = (keyAscii[j] - 65) + clearAscii[i];
-      if (cipherAscii[i] > 90) cipherAscii[i] = cipherAscii[i] - 26;
+      cipherAscii[i] = (keyAscii[j] - this.istart) + clearAscii[i];
+      if (cipherAscii[i] > this.iend) cipherAscii[i] = cipherAscii[i] - (this.iend - this.istart + 1);
       cipherString[i] = Character.toString ((char) cipherAscii[i]);
       j++;
       if (j == key.length()) j = 0;
@@ -63,7 +79,7 @@ public class Vigenere {
    * @param clear     String of cipher text to be decrypted
    * @return          String of clear text
    */
-  public static String decrypt(String key, String cipher) {
+  public String decrypt(String key, String cipher) {
 
     // Initialize varibles and arrays
     int keyLength = key.length();
@@ -87,8 +103,8 @@ public class Vigenere {
     // Create ciphertext
     int j = 0;
     for (int i = 0; i < cipher.length(); i++) {
-      clearAscii[i] = cipherAscii[i] - (keyAscii[j] - 65);
-      if (clearAscii[i] < 65) clearAscii[i] = clearAscii[i] + 26;
+      clearAscii[i] = cipherAscii[i] - (keyAscii[j] - this.istart);
+      if (clearAscii[i] < this.istart) clearAscii[i] = clearAscii[i] + (this.iend - this.istart + 1);
       clearString[i] = Character.toString ((char) clearAscii[i]);
       j++;
       if (j == key.length()) j = 0;
@@ -105,16 +121,17 @@ public class Vigenere {
    *
    * @param keyspace  int for the size of the keyspace
    * @param cipher    String of cipher text to brute forced
-   * 
+   *
    */
-  public static void bruteForce(int keyspace, String cipher) {
-    
+  public void bruteForce(int keyspace, String cipher) {
+
     // Initialize
     String key = "";
     String clear;
     int[] keyAscii = new int[keyspace];
-    Arrays.fill(keyAscii, 65);
-    double iters = (Math.pow(26.0, (double) keyspace));
+    Arrays.fill(keyAscii, this.istart);
+    double length = (double) (this.iend - this.istart + 1);
+    double iters = (Math.pow(length, (double) keyspace));
 
     // Form string from array of Ascii values
     StringBuilder sb = new StringBuilder();
@@ -144,16 +161,17 @@ public class Vigenere {
    * @param scanWord  String for the word we're scanning for
    * @param cipher    String of cipher text to brute forced
    * @return key      String of the key that worked or "none" if the word was not found
-   * 
+   *
    */
-  public static String bruteForceScan(int keyspace, String scanWord, String cipher) {
-    
+  public String bruteForceScan(int keyspace, String scanWord, String cipher) {
+
     // Initialize
     String key = "";
     String clear;
     int[] keyAscii = new int[keyspace];
-    Arrays.fill(keyAscii, 65);
-    double iters = (Math.pow(26.0, (double) keyspace));
+    Arrays.fill(keyAscii, this.istart);
+    double length = (double) (this.iend - this.istart + 1);
+    double iters = (Math.pow(length, (double) keyspace));
     boolean scan = false;
 
     // Form string from array of Ascii values
@@ -168,10 +186,10 @@ public class Vigenere {
 
       // Decrypt this key
       clear = decrypt(key, cipher);
-      
+
       // Check if the word is there
       scan = scan(scanWord, clear);
-      
+
       // If it is, we're done
       if (scan) return key;
 
@@ -180,7 +198,7 @@ public class Vigenere {
     }
     // We couldn't find it.  return "none"
     return "none";
-    
+
   }
   /**
    * Given a key, returns the next logical key in the keyspace (e.g. AA -> AB, AZ -> BA)
@@ -188,28 +206,28 @@ public class Vigenere {
    * @param key       String for the key
    * @return          String of the next logical key
    */
-  public static String nextKey(String key) {
-    
+  public String nextKey(String key) {
+
     // Initialize
     int keyspace = key.length();
     StringBuilder sb = new StringBuilder(key);
-    
+
     // Get the next key if it's a special case
-    if ( (int) key.charAt(keyspace - 1) == 90 ) {
+    if ( (int) key.charAt(keyspace - 1) == this.iend ) {
       for (int i = 1; i < keyspace; i++) {
-        if ( (int) key.charAt(keyspace - i) == 90 ) {
-          sb.setCharAt(keyspace - i, 'A');
+        if ( (int) key.charAt(keyspace - i) == this.iend ) {
+          sb.setCharAt(keyspace - i, (char) this.istart);
           int current = (int) sb.charAt(keyspace - (i + 1));
           char next = (char) (current + 1);
           sb.setCharAt(keyspace - (i + 1), next);
         }
       }
-      
+
     // Fix format and return
     key = sb.toString();
     return key;
     }
-    
+
     // Get the next key if it's a simple increment, fix format, and return
     else {
       int current = (int) sb.charAt(keyspace - 1);
@@ -223,22 +241,22 @@ public class Vigenere {
    * Cleans the return string of an Array.toString() by removing brackets, spaces, and commas
    *
    * @param arrString String of the form of an Array.toString() call
-   * @return          String without brackets, commas, or spaces 
+   * @return          String without brackets, commas, or spaces
    */
-    public static String clean(String arrString) {
-      
+    public String clean(String arrString) {
+
     // Initialize
     StringBuilder dec = new StringBuilder(arrString); // Stands for 'decremented'
     StringBuilder rec = new StringBuilder();          // Stands for 'recorded'
-    
+
     // Remove brackets
     dec.deleteCharAt(arrString.length() - 1);
     dec.deleteCharAt(0);
     dec.append(".."); // accounts for last iteration of coming loop
-    
+
     // Count how many letters
     int range = dec.length() / 3;
-    
+
     // Once per letter
     for (int i = 0; i < range; i++) {
       rec.append(dec.charAt(0));  // Save the letter
@@ -246,37 +264,37 @@ public class Vigenere {
       dec.deleteCharAt(0);        // Remove the comma
       dec.deleteCharAt(0);        // Remove the soace
     }
-    
+
     // Back to a string and return
     String result = rec.toString();
     return result;
   }
   /**
    * Encrypts cipher text with itself as a key. Used to create a more complicated, layered cipher.
-   * 
+   *
    * @param cipher    String for the cipher text
    * @return          A cipher that's been encrypted yet again
    */
-  public static String layer(String cipher) {
+  public String layer(String cipher) {
     String cipherNew = encrypt(cipher, cipher);
     return cipherNew;
   }
     /**
    * Scans cipher text to see if it contains a particular word.
-   * 
+   *
    * @param scanWord  String for the word we are scanning for
    * @param cipher    String for the cipher text
    * @return          Boolean true if it the word is found, false if it is not
    */
-  public static boolean scan(String scanWord, String cipher) {
-    
+  public boolean scan(String scanWord, String cipher) {
+
     // Initialize
     StringBuilder sbCipher  = new StringBuilder(cipher); // An SB of the whole cipher
     StringBuilder sbSection = new StringBuilder();       // An SB to hold sections of the cipher we're checking for the word
     int end = scanWord.length();     // Index of the last letter of the section
     int last = cipher.length() - 1;  // Index of the last letter of the cipher
     boolean same = false;            // Holds the truth value of the comparison
-    
+
     // Loop through each section of the cipher and check if it's the scanWord
     for (int start = 0; start < last - scanWord.length(); start++) {
       sbSection.append(sbCipher.substring(start, end));  // Grab the next section of the cipher
